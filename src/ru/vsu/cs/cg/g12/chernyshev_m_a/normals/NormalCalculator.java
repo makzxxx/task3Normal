@@ -4,19 +4,16 @@ import ru.vsu.cs.cg.g12.chernyshev_m_a.math.Vector3f;
 import ru.vsu.cs.cg.g12.chernyshev_m_a.model.Model;
 import ru.vsu.cs.cg.g12.chernyshev_m_a.model.Polygon;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NormalCalculator {
-
     public static void calculateNormals(Model model) {
-        List<Vector3f> computedNormals = new ArrayList<>();
-        Map<Integer, List<Vector3f>> vertexToNormals = new HashMap<>();
+        model.normals.clear();
+        Map<Vector3f, Integer> normalToIndex = new HashMap<>();
 
         for (Polygon polygon : model.polygons) {
             List<Integer> vertexIndices = polygon.getVertexIndices();
+            List<Integer> normalIndices = new ArrayList<>();
 
             for (int i = 0; i < vertexIndices.size() - 2; i++) {
                 Vector3f v0 = model.vertices.get(vertexIndices.get(0));
@@ -27,19 +24,21 @@ public class NormalCalculator {
                 Vector3f edge2 = subtract(v2, v0);
                 Vector3f normal = crossProduct(edge1, edge2).normal();
 
-                computedNormals.add(normal);
+                int normalIndex;
+                if (normalToIndex.containsKey(normal)) {
+                    normalIndex = normalToIndex.get(normal);
+                } else {
+                    normalIndex = model.normals.size();
+                    model.normals.add(normal);
+                    normalToIndex.put(normal, normalIndex);
+                }
 
-                for (int index : List.of(vertexIndices.get(0), vertexIndices.get(i + 1), vertexIndices.get(i + 2))) {
-                    vertexToNormals.computeIfAbsent(index, k -> new ArrayList<>()).add(normal);
+                for (int j = 0; j < 3; j++) {
+                    normalIndices.add(normalIndex);
                 }
             }
-        }
 
-        model.normals.clear();
-        for (int i = 0; i < model.vertices.size(); i++) {
-            List<Vector3f> normals = vertexToNormals.getOrDefault(i, new ArrayList<>());
-            Vector3f averageNormal = average(normals);
-            model.normals.add(averageNormal);
+            polygon.setNormalIndices(new ArrayList<>(normalIndices));
         }
     }
 

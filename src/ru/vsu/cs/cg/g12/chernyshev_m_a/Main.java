@@ -11,13 +11,13 @@ import java.nio.file.Path;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        String fileContent = Files.readString(Path.of("C:\\Users\\maksi\\OneDrive\\Рабочий стол\\ObjWriter-master\\models\\before\\caracal_cube.obj"));
+        String fileContent = Files.readString(Path.of("C:\\Users\\maksi\\IdeaProjects\\task3Normal\\models\\after\\TeapotNoUV.obj"));
 
         Model model = ObjReader.read(fileContent);
         ObjWriter writerClass = new ObjWriter();
         NormalCalculator.calculateNormals(model);
 
-        writerClass.write(model,"C:\\Users\\maksi\\OneDrive\\Рабочий стол\\ObjWriter-master\\models\\after\\1#2TEST.obj");
+        writerClass.write(model,"C:\\Users\\maksi\\IdeaProjects\\task3Normal\\models\\Normals\\TeapotNoUV.obj");
     }
 
 
